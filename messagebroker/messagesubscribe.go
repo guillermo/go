@@ -16,7 +16,7 @@ import (
 type MessageBroker struct {
 	ms              *MessageStore
 	C               chan (interface{}) // Publish channel
-	Size            int                // Total number of messages to store
+	size            int                // Total number of messages to store
 	subscribeChan   chan (*Subscription)
 	unsubscribeChan chan (*Subscription)
 	subscriptions   []*Subscription
@@ -53,7 +53,7 @@ func NewMessageBroker(size int) *MessageBroker {
 // channel. To stop the broker is enought to close the channel C.
 func NewMessageBrokerWithChannel(size int, channel chan (interface{})) *MessageBroker {
 	b := &MessageBroker{
-		Size:            size,
+		size:            size,
 		C:               channel,
 		ms:              NewMessageStore(size),
 		subscribeChan:   make(chan (*Subscription)),
