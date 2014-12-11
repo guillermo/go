@@ -1,8 +1,8 @@
 // Package messagesubscribe is a publis subscription model based in
 // messagestore where each message gets an index (autoincrement) and
 // subscribers can decide which should be the first message to get from the
-// history.
-package messagesubscribe
+// history. Server Sent Events is a good use case for MessageBroker
+package messagebroker
 
 import (
 	. "github.com/guillermo/go/messagestore"

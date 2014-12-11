@@ -1,4 +1,4 @@
-package messagesubscribe
+package messagebroker
 
 import (
 	"fmt"
