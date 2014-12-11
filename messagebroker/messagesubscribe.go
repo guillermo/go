@@ -34,23 +34,26 @@ type Subscription struct {
 	broker *MessageBroker
 }
 
-// Message is each of the message that the subscriber will get. It have an
-// index and the custom Data.
+// Message is received structure in the subscription channel.
 type Message struct {
 	Index int
 	Data  interface{}
 }
 
-// NewMessageBroker creates and starts a new Broker with capacity for up to
-// *size* messages. The publish channel have a message buffer of 1024.
-// To stop the broker is enought to close the channel C.
+// NewMessageBroker creates a new Broker with capacity for up to
+// _size_ messages.
+//
+// The publish channel have a message buffer of 1024 by default.
+//
+// To stop the broker is enought to close the channel C. Ensure that all the
+// subscriber waits until the subscription channel is also close.
 func NewMessageBroker(size int) *MessageBroker {
 	c := make(chan (interface{}), 1024)
 	return NewMessageBrokerWithChannel(size, c)
 }
 
-// NewMessageBrokerWithChannel creates and starts a new Broker with the specify
-// channel. To stop the broker is enought to close the channel C.
+// NewMessageBrokerWithChannel creates a new Broker with the specify
+// channel. See NewMessageBroker.
 func NewMessageBrokerWithChannel(size int, channel chan (interface{})) *MessageBroker {
 	b := &MessageBroker{
 		size:            size,
@@ -65,7 +68,7 @@ func NewMessageBrokerWithChannel(size int, channel chan (interface{})) *MessageB
 }
 
 // SubscribeFrom creates a new subscription that will receive all the previous
-// messages with an index bigger than *first* and all the new messages until
+// messages with an index bigger than _first_ and all the new messages until
 // the publish channel is close or the subscription is cancel through
 // Unsubscribe(). Once that happends the channel C is close.
 func (b *MessageBroker) SubscribeFrom(first int) *Subscription {
@@ -84,7 +87,7 @@ func (b *MessageBroker) SubscribeFrom(first int) *Subscription {
 }
 
 // Unsubscribe will cancel the subscriptions. Messages should still arrive and
-// you must to wait until the subscription channel is close.
+// you must to wait until the broker closes the channel.
 func (s *Subscription) Unbscribe() {
 	s.broker.unsubscribeChan <- s
 }
