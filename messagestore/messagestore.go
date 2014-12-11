@@ -9,12 +9,18 @@ import (
 	"sync"
 )
 
+// MessageStore is a buffered indexed with fixed maxium size FIFO.
+// By default the first element is indexed as 0.
 type MessageStore struct {
 	mu          sync.RWMutex
 	first       int // Index of the first element. It start in 0 unless set otherwise.
 	msgs        []interface{}
 	nextPointer int
 }
+
+var (
+	IndexOutOfRange = errors.New("Index Out of Range")
+)
 
 // NewMessageStore creates a new MessageStore with a maxium size.
 // If size is lower than 1 it will panic.
@@ -95,10 +101,8 @@ func (ms *MessageStore) Size() int {
 	return len(ms.msgs)
 }
 
-var (
-	IndexOutOfRange = errors.New("Index Out of Range")
-)
-
+// Get return the element with the specify index. If the index is out of range
+// IndexOutOfRange is returned as an error.
 func (ms *MessageStore) Get(index int) (interface{}, error) {
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()
