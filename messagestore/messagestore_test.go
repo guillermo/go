@@ -136,6 +136,76 @@ func ExampleMessageStore() {
 
 }
 
+// to String Slice
+func toSS(s []interface{}) (data []string) {
+	data = make([]string, len(s))
+	for i, v := range s {
+		data[i] = v.(string)
+	}
+	return data
+}
+
+func compare(t *testing.T, test string, a []interface{}, b []string) {
+	if len(a) != len(b) {
+		t.Fatal(test, "Get len", toSS(a), "Expect len", b)
+		for i, v := range toSS(a) {
+			if v != b[i] {
+				t.Error(test, "Get", v, "Expect", b)
+			}
+		}
+	}
+}
+
+func TestRange(t *testing.T) {
+	ms := NewMessageStoreWithFirst(2, 10)
+
+	compare(t, "t1", ms.Range(0, 0), []string{})
+	compare(t, "t2", ms.Range(10, 10), []string{})
+
+	// One item
+	ms.Push("A") // Should have index 10
+
+	compare(t, "t3", ms.Range(0, 0), []string{})
+	compare(t, "t4", ms.Range(10, 10), []string{})
+	compare(t, "t5", ms.Range(10, 11), []string{"A"})
+
+	ms.Push("B") // Should have index 10
+
+	compare(t, "t6", ms.Range(0, 0), []string{})
+	compare(t, "t7", ms.Range(10, 10), []string{})
+	compare(t, "t8", ms.Range(10, 11), []string{"A"})
+	compare(t, "t9", ms.Range(10, 12), []string{"A", "B"})
+	compare(t, "ta", ms.Range(11, 12), []string{"B"})
+	compare(t, "tb", ms.Range(11, 16), []string{"B"})
+	compare(t, "tc", ms.Range(12, 16), []string{})
+
+}
+
+func TestFrom(t *testing.T) {
+	ms := NewMessageStoreWithFirst(2, 10)
+
+	compare(t, "t1", ms.From(0), []string{})
+	compare(t, "t2", ms.From(10), []string{})
+
+	// One item
+	ms.Push("A") // Should have index 10
+
+	compare(t, "t3", ms.From(0), []string{})
+	compare(t, "t4", ms.From(10), []string{"A"})
+	compare(t, "t5", ms.From(10), []string{"A"})
+
+	ms.Push("B") // Should have index 10
+
+	compare(t, "t6", ms.From(0), []string{})
+	compare(t, "t7", ms.From(10), []string{"A", "B"})
+	compare(t, "t8", ms.From(10), []string{"A", "B"})
+	compare(t, "t9", ms.From(10), []string{"A", "B"})
+	compare(t, "ta", ms.From(11), []string{"B"})
+	compare(t, "tb", ms.From(11), []string{"B"})
+	compare(t, "tc", ms.From(12), []string{})
+
+}
+
 func ExampleMessageStoreGet() {
 	ms := NewMessageStore(1)
 	val, err := ms.Get(0)

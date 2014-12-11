@@ -116,3 +116,26 @@ func (ms *MessageStore) Get(index int) (interface{}, error) {
 	}
 	return ms.msgs[offset-cap(ms.msgs)], nil
 }
+
+// Range return an slice with the elements which index is included between the
+// maxium and minimum. [from, to). The returned slice will have a maximum of
+// to-from elements.
+func (ms *MessageStore) Range(from int, to int) []interface{} {
+	ms.mu.RLock()
+	defer ms.mu.RUnlock()
+	if len(ms.msgs) == 0 || to < ms.first || from > (ms.first+len(ms.msgs)) {
+		return []interface{}{}
+	}
+
+	first := from - ms.first
+	last := to - ms.first
+	if last > len(ms.msgs) {
+		last = len(ms.msgs)
+	}
+	return ms.Messages()[first:last]
+}
+
+// From return an slice with the elements which index is bigger than from
+func (ms *MessageStore) From(from int) []interface{} {
+	return ms.Range(from, from+len(ms.msgs))
+}
