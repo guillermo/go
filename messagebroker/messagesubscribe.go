@@ -88,7 +88,7 @@ func (b *MessageBroker) SubscribeFrom(first int) *Subscription {
 
 // Unsubscribe will cancel the subscriptions. Messages should still arrive and
 // you must to wait until the broker closes the channel.
-func (s *Subscription) Unbscribe() {
+func (s *Subscription) Unsubscribe() {
 	s.broker.unsubscribeChan <- s
 }
 
