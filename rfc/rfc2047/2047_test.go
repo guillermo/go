@@ -50,7 +50,7 @@ func ExampleConvert() {
 	// Patrik Fältström
 }
 
-func ExampleRfc2047String() {
+func ExampleRfc2047_String() {
 	s := &Rfc2047{S: "=?ISO-666-1?Q?The_ch=65rset_is_weird?="}
 	fmt.Println(s.String())
 	if len(s.Errors) > 0 {
